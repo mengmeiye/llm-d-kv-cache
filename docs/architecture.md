@@ -102,6 +102,9 @@ When a block is offloaded from GPU to CPU, the engine emits a `BlockStored` with
 On eviction, the indexer only removes the `engineKey → requestKey` mapping if all associated request keys have no remaining pod entries. This preserves the mapping when other tiers still hold the block.
 
 ```
+  E1 = engine key (the engine's internal content-address hash for the block)
+  R1 = request key (the indexer's own hash, computed from tokens)
+
   1. GPU BlockStored (engine_key=E1, tier=gpu, tokens=[...])
      → computes R1 from tokens, stores E1 → R1, stores R1 → {pod, gpu}
 
@@ -111,6 +114,9 @@ On eviction, the indexer only removes the `engineKey → requestKey` mapping if 
   3. GPU BlockRemoved (engine_key=E1, tier=gpu)
      → evicts R1 → {pod, gpu}, R1 still has {pod, cpu} → keeps E1 → R1
 ```
+
+> [!NOTE]
+> **Event ordering guarantee:** Events from the same pod are processed in order because the event pool shards worker queues by pod identifier (FNV-1a hash). Since both the GPU `BlockStored` and the subsequent CPU offload `BlockStored` originate from the same engine on the same pod, the GPU event (which carries tokens and establishes the `engineKey → requestKey` mapping) is always processed before the CPU event that depends on it. As a defensive measure, if a CPU offload event arrives for an engine key with no existing mapping, the indexer treats it as a graceful no-op (logs at debug level and skips).
 
 ### The Dual-Key Design
 
