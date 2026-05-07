@@ -116,7 +116,7 @@ On eviction, the indexer only removes the `engineKey → requestKey` mapping if 
 ```
 
 > [!NOTE]
-> **Event ordering guarantee:** Events from the same pod are processed in order because the event pool shards worker queues by pod identifier (FNV-1a hash). Since both the GPU `BlockStored` and the subsequent CPU offload `BlockStored` originate from the same engine on the same pod, the GPU event (which carries tokens and establishes the `engineKey → requestKey` mapping) is always processed before the CPU event that depends on it. As a defensive measure, if a CPU offload event arrives for an engine key with no existing mapping, the indexer treats it as a graceful no-op (logs at debug level and skips).
+> **Event ordering guarantee:** A block must exist on GPU before it can be offloaded to CPU, so the engine always publishes the GPU `BlockStored` (with tokens) before the CPU `BlockStored` (without tokens). Both events originate from the same pod, and per-pod event ordering is preserved through the processing pipeline. As a defensive measure, if a CPU offload event arrives for an engine key with no existing mapping (e.g. due to message loss), the indexer treats it as a graceful no-op.
 
 ### The Dual-Key Design
 
