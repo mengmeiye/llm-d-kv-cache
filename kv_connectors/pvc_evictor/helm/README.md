@@ -13,6 +13,14 @@ This Helm chart deploys the PVC Evictor, a multi-process Kubernetes deployment t
 
 ### Quick Start
 
+By default, the chart uses:
+
+```text
+quay.io/pvc-evictor/pvc-evictor:latest
+```
+
+For reproducible llm-d v0.x deployments, pin `image.tag` to `llm-d-v0.x`.
+
 ```bash
 # Install with required values
 helm install pvc-evictor ./helm \
@@ -63,6 +71,15 @@ Then install:
 
 ```bash
 helm install pvc-evictor ./helm -f my-values.yaml
+```
+
+To pin a specific image tag, override the image fields:
+
+```bash
+helm install pvc-evictor ./helm \
+  --set pvc.name=my-kv-cache-pvc \
+  --set image.repository=quay.io/pvc-evictor/pvc-evictor \
+  --set image.tag=llm-d-v0.8
 ```
 
 ## Configuration

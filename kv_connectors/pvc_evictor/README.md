@@ -8,6 +8,14 @@ The PVC Evictor is a multi-process Kubernetes deployment designed to automatical
 
 ## Quick Start
 
+The chart defaults to the latest PVC Evictor image:
+
+```text
+quay.io/pvc-evictor/pvc-evictor:latest
+```
+
+For reproducible llm-d v0.x deployments, pin `image.tag` to `llm-d-v0.x`.
+
 ```bash
 helm install pvc-evictor ./helm \
   --set pvc.name=my-vllm-cache \
@@ -183,6 +191,13 @@ Build image (from `kv_connectors/`):
 
 ```bash
 make docker-build
+```
+
+By default, this builds `quay.io/pvc-evictor/pvc-evictor:latest`.
+Override the target when testing a local or development tag:
+
+```bash
+make docker-build IMAGE_REPOSITORY=quay.io/pvc-evictor/pvc-evictor IMAGE_TAG=llm-d-v0.8
 ```
 
 ## Documentation
