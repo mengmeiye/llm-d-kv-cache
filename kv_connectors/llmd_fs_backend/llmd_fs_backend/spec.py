@@ -75,6 +75,10 @@ class SharedStorageOffloadingSpec(OffloadingSpec):
         )
         self.gpu_blocks_per_file = self.offloaded_block_size // self.hash_block_size
 
+        # Dont leave block size to default value of 1 when
+        # block_size is not set in extra_config
+        self.block_size_factor = self.gpu_blocks_per_file
+
         self.read_preferring_ratio = float(
             self.extra_config.get(
                 "read_preferring_ratio", DEFAULT_READ_PREFERRING_WORKERS_RATIO
